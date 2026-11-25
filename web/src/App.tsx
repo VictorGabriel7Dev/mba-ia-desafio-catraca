@@ -6,6 +6,7 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { LoginPage } from "./pages/LoginPage";
 import { OrganizerPage } from "./pages/OrganizerPage";
 import { EventManagePage } from "./pages/EventManagePage";
+import { MeusIngressosPage } from "./pages/MeusIngressosPage";
 import type { ReactElement } from "react";
 
 // Guarda de rota: só organizador autenticado entra na área de organizador.
@@ -15,6 +16,18 @@ function GuardaOrganizador({ children }: { children: ReactElement }): ReactEleme
     return <p>Carregando...</p>;
   }
   if (!usuario || usuario.role !== "organizer") {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
+// Guarda de rota: qualquer usuario autenticado (participante ou organizador).
+function GuardaAutenticado({ children }: { children: ReactElement }): ReactElement {
+  const { usuario, carregando } = useSessao();
+  if (carregando) {
+    return <p>Carregando...</p>;
+  }
+  if (!usuario) {
     return <Navigate to="/login" replace />;
   }
   return children;
@@ -37,6 +50,14 @@ export function App(): ReactElement {
           <Route path="/" element={<HomePage />} />
           <Route path="/cadastro" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/meus-ingressos"
+            element={
+              <GuardaAutenticado>
+                <MeusIngressosPage />
+              </GuardaAutenticado>
+            }
+          />
           <Route
             path="/organizador"
             element={

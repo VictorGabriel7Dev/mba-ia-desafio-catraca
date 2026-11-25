@@ -93,6 +93,43 @@ export function cancelarEvento(id: string) {
   return pedir<Evento>(`/api/organizer/events/${id}/cancel`, { method: "POST" });
 }
 
+export type StatusIngresso = "pending" | "confirmed" | "declined" | "cancelled" | "refunded";
+
+export interface Ingresso {
+  id: string;
+  eventId: string;
+  code: string;
+  status: StatusIngresso;
+  buyerEmail: string;
+  buyerUserId: string | null;
+  pricePaidCents: number;
+  createdAt: string;
+}
+
+export interface IngressoComEvento extends Ingresso {
+  statusLabel: string;
+  evento: {
+    id: string;
+    name: string;
+    startsAt: string;
+    location: string;
+    status: "draft" | "published" | "cancelled";
+  };
+}
+
+// Compra pela vitrine (exige sessao). O comprador e o usuario logado.
+export function comprarIngresso(eventoId: string, cardNumber: string) {
+  return pedir<Ingresso>(`/api/events/${eventoId}/purchases`, {
+    method: "POST",
+    body: JSON.stringify({ cardNumber }),
+  });
+}
+
+// "Meus ingressos" do participante logado.
+export function meusIngressos() {
+  return pedir<IngressoComEvento[]>("/api/me/tickets");
+}
+
 export function registrar(dados: { name: string; email: string; password: string }) {
   return pedir<{ user: Usuario }>("/api/auth/register", {
     method: "POST",
