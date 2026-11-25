@@ -5,6 +5,7 @@ import { HomePage } from "./pages/HomePage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { LoginPage } from "./pages/LoginPage";
 import { OrganizerPage } from "./pages/OrganizerPage";
+import { EventManagePage } from "./pages/EventManagePage";
 import type { ReactElement } from "react";
 
 // Guarda de rota: só organizador autenticado entra na área de organizador.
@@ -41,6 +42,14 @@ export function App(): ReactElement {
             element={
               <GuardaOrganizador>
                 <OrganizerPage />
+              </GuardaOrganizador>
+            }
+          />
+          <Route
+            path="/organizador/eventos/:id"
+            element={
+              <GuardaOrganizador>
+                <EventManagePage />
               </GuardaOrganizador>
             }
           />

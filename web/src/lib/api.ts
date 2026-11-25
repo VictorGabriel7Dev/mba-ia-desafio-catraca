@@ -32,6 +32,67 @@ async function pedir<T>(caminho: string, opcoes: RequestInit = {}): Promise<T> {
   return corpo as T;
 }
 
+export interface Evento {
+  id: string;
+  organizerId: string;
+  name: string;
+  startsAt: string;
+  location: string;
+  capacity: number;
+  priceCents: number;
+  status: "draft" | "published" | "cancelled";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DadosEvento {
+  name: string;
+  startsAt: string;
+  location: string;
+  capacity: number;
+  priceCents: number;
+}
+
+// Vitrine publica (sem sessao).
+export function listarVitrine() {
+  return pedir<Evento[]>("/api/events");
+}
+
+export function obterEventoPublico(id: string) {
+  return pedir<Evento>(`/api/events/${id}`);
+}
+
+// Area do organizador (exige sessao de organizador).
+export function listarMeusEventos() {
+  return pedir<Evento[]>("/api/organizer/events");
+}
+
+export function obterEventoGestao(id: string) {
+  return pedir<Evento>(`/api/organizer/events/${id}`);
+}
+
+export function criarEvento(dados: DadosEvento) {
+  return pedir<Evento>("/api/organizer/events", {
+    method: "POST",
+    body: JSON.stringify(dados),
+  });
+}
+
+export function editarEvento(id: string, dados: DadosEvento) {
+  return pedir<Evento>(`/api/organizer/events/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(dados),
+  });
+}
+
+export function publicarEvento(id: string) {
+  return pedir<Evento>(`/api/organizer/events/${id}/publish`, { method: "POST" });
+}
+
+export function cancelarEvento(id: string) {
+  return pedir<Evento>(`/api/organizer/events/${id}/cancel`, { method: "POST" });
+}
+
 export function registrar(dados: { name: string; email: string; password: string }) {
   return pedir<{ user: Usuario }>("/api/auth/register", {
     method: "POST",
