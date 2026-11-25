@@ -1,0 +1,4 @@
+node_modules/
+.env
+_DESENVOLVIMENTO.md
+dist/
