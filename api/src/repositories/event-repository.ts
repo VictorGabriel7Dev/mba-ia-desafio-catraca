@@ -3,6 +3,7 @@
 // Prisma direto. A contagem de ocupadas e a transicao em lote no cancelamento
 // vivem aqui porque F3 e F5 reaproveitam a mesma porta.
 import type { Event } from "@prisma/client";
+import type { StatusIngresso } from "../domain/ingresso";
 import { prisma } from "../lib/prisma";
 
 export interface NovoEvento {
@@ -66,20 +67,21 @@ export async function contarOcupadas(eventId: string): Promise<number> {
 }
 
 // Cancelamento atomico (R11): marca o evento como cancelled e, na mesma
-// transacao, transita os ingressos do evento (confirmed -> refunded,
-// pending -> cancelled). A regra de transicao de ingresso pertence ao dominio
-// de F3; enquanto F3 nao existe, ela e aplicada aqui de forma direta. Quando F3
-// chegar, consolidar em services/cancel-tickets.ts (ver F3-compra-vagas-pagamento.md).
-export async function cancelarComIngressos(eventId: string): Promise<void> {
+// transacao, aplica as transicoes de ingresso recebidas. A REGRA das transicoes
+// (confirmed -> refunded, pending -> cancelled) mora no dominio
+// (domain/ingresso.ts) e e consolidada em services/cancel-tickets.ts; aqui so
+// se executa a aplicacao atomica, na ordem recebida.
+export async function cancelarEventoETransitarIngressos(
+  eventId: string,
+  transicoes: Array<{ de: StatusIngresso; para: StatusIngresso }>,
+): Promise<void> {
   await prisma.$transaction([
     prisma.event.update({ where: { id: eventId }, data: { status: "cancelled" } }),
-    prisma.ticket.updateMany({
-      where: { eventId, status: "confirmed" },
-      data: { status: "refunded" },
-    }),
-    prisma.ticket.updateMany({
-      where: { eventId, status: "pending" },
-      data: { status: "cancelled" },
-    }),
+    ...transicoes.map(({ de, para }) =>
+      prisma.ticket.updateMany({
+        where: { eventId, status: de },
+        data: { status: para },
+      }),
+    ),
   ]);
 }
