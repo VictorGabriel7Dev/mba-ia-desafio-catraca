@@ -16,6 +16,7 @@ import {
 } from "../domain/evento";
 import { ErroAplicacao } from "../lib/errors";
 import * as eventos from "../repositories/event-repository";
+import { cancelarEventoComIngressos } from "./cancel-tickets";
 
 export interface EventoPublico {
   id: string;
@@ -148,7 +149,8 @@ export async function cancelar(eventId: string, organizerId: string): Promise<Ev
     throw new ErroAplicacao("invalid_state", 409, "Evento ja cancelado.");
   }
   // Marca cancelado e transita os ingressos (R11) numa unica transacao.
-  await eventos.cancelarComIngressos(eventId);
+  // A transicao mora em services/cancel-tickets.ts (consolidada na F3).
+  await cancelarEventoComIngressos(eventId);
   const atualizado = await eventos.buscarPorId(eventId);
   // Nao e nulo: acabamos de atualizar dentro da transacao.
   return paraPublico(atualizado as Event);

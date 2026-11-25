@@ -9,6 +9,8 @@ import { authRoutes } from "./auth-routes";
 import { partnerRoutes } from "./partner-routes";
 import { organizerRoutes } from "./organizer-routes";
 import { vitrineRoutes } from "./vitrine-routes";
+import { purchaseRoutes } from "./purchase-routes";
+import { meRoutes } from "./me-routes";
 import type { NextFunction, Request, Response } from "express";
 
 export function criarApp() {
@@ -30,6 +32,9 @@ export function criarApp() {
   app.use("/api/auth", authRoutes);
   app.use("/api/partner", partnerRoutes);
   app.use("/api/organizer", organizerRoutes);
+  app.use("/api/me", meRoutes);
+  // Compra pela vitrine e vitrine publica compartilham a base /api/events.
+  app.use("/api/events", purchaseRoutes);
   app.use("/api/events", vitrineRoutes);
 
   // 404 padrão.
