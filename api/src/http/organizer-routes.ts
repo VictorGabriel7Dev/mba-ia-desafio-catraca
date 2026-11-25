@@ -1,15 +1,63 @@
-// Área de organizador. Em F1 há apenas um stub protegido por sessão + papel,
-// para provar a barreira de autorização (C-F1-04 / CF1.4 / R13).
-// F2 preenche a gestão de eventos.
+// Area de organizador: gestao de eventos (F2). Toda rota exige sessao valida e
+// papel "organizer"; o servico garante que o organizador so opera os proprios
+// eventos (R13). A pagina de gestao responde por URL propria /events/:id (R04).
 import { Router } from "express";
+import * as eventos from "../services/event-service";
 import { exigirSessao } from "./middlewares/exigir-sessao";
 import { exigirPapel } from "./middlewares/exigir-papel";
+import { envolver } from "./async";
+import "./context";
 
 export const organizerRoutes = Router();
 
 organizerRoutes.use(exigirSessao, exigirPapel("organizer"));
 
-// Stub: visível apenas para organizador autenticado.
-organizerRoutes.get("/events", (_req, res) => {
-  res.status(200).json([]);
-});
+// Lista apenas os eventos do organizador autenticado.
+organizerRoutes.get(
+  "/events",
+  envolver(async (req, res) => {
+    const lista = await eventos.listarDoOrganizador(req.sessao!.sub);
+    res.status(200).json(lista);
+  }),
+);
+
+organizerRoutes.post(
+  "/events",
+  envolver(async (req, res) => {
+    const evento = await eventos.criar(req.sessao!.sub, req.body ?? {});
+    res.status(201).json(evento);
+  }),
+);
+
+// Pagina de gestao por URL propria (R04).
+organizerRoutes.get(
+  "/events/:id",
+  envolver(async (req, res) => {
+    const evento = await eventos.obterParaGestao(req.params.id, req.sessao!.sub);
+    res.status(200).json(evento);
+  }),
+);
+
+organizerRoutes.patch(
+  "/events/:id",
+  envolver(async (req, res) => {
+    const evento = await eventos.editar(req.params.id, req.sessao!.sub, req.body ?? {});
+    res.status(200).json(evento);
+  }),
+);
+
+organizerRoutes.post(
+  "/events/:id/publish",
+  envolver(async (req, res) => {
+    const evento = await eventos.publicar(req.params.id, req.sessao!.sub);
+    res.status(200).json(evento);
+  }),
+);
+
+organizerRoutes.post(
+  "/events/:id/cancel",
+  envolver(async (req, res) => {
+    const evento = await eventos.cancelar(req.params.id, req.sessao!.sub);
+    res.status(200).json(evento);
+  }),
+);

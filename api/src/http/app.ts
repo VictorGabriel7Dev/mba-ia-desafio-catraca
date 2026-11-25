@@ -8,6 +8,7 @@ import { ErroAplicacao } from "../lib/errors";
 import { authRoutes } from "./auth-routes";
 import { partnerRoutes } from "./partner-routes";
 import { organizerRoutes } from "./organizer-routes";
+import { vitrineRoutes } from "./vitrine-routes";
 import type { NextFunction, Request, Response } from "express";
 
 export function criarApp() {
@@ -29,6 +30,7 @@ export function criarApp() {
   app.use("/api/auth", authRoutes);
   app.use("/api/partner", partnerRoutes);
   app.use("/api/organizer", organizerRoutes);
+  app.use("/api/events", vitrineRoutes);
 
   // 404 padrão.
   app.use((_req, res) => {
