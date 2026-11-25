@@ -43,7 +43,6 @@ export function criarApp() {
       res.status(erro.status).json({ error: erro.codigo });
       return;
     }
-    // eslint-disable-next-line no-console
     console.error("Erro não tratado:", erro);
     res.status(500).json({ error: "internal_error" });
   });

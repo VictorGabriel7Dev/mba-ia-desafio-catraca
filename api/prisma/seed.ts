@@ -38,13 +38,11 @@ async function main(): Promise<void> {
     create: { key: CHAVE_PARCEIRO, name: "Parceiro Demo", active: true },
   });
 
-  // eslint-disable-next-line no-console
   console.log("Seed concluída: 2 organizadores, 1 participante, 1 chave de parceiro ativa.");
 }
 
 main()
   .catch((erro) => {
-    // eslint-disable-next-line no-console
     console.error("Falha na seed:", erro);
     process.exitCode = 1;
   })
