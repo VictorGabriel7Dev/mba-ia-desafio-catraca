@@ -3,6 +3,7 @@
 // eventos (R13). A pagina de gestao responde por URL propria /events/:id (R04).
 import { Router } from "express";
 import * as eventos from "../services/event-service";
+import * as checkin from "../services/checkin-service";
 import { exigirSessao } from "./middlewares/exigir-sessao";
 import { exigirPapel } from "./middlewares/exigir-papel";
 import { envolver } from "./async";
@@ -59,5 +60,17 @@ organizerRoutes.post(
   envolver(async (req, res) => {
     const evento = await eventos.cancelar(req.params.id, req.sessao!.sub);
     res.status(200).json(evento);
+  }),
+);
+
+// Check-in de ingresso (F4, R10). So o dono do evento opera (R13, garantido pelo
+// servico). Responde a mensagem de R10 e o estado do ingresso.
+organizerRoutes.post(
+  "/events/:id/checkin",
+  envolver(async (req, res) => {
+    const corpo = (req.body ?? {}) as { codigo?: unknown };
+    const codigo = typeof corpo.codigo === "string" ? corpo.codigo : "";
+    const resultado = await checkin.fazerCheckin(req.params.id, req.sessao!.sub, codigo);
+    res.status(200).json(resultado);
   }),
 );
