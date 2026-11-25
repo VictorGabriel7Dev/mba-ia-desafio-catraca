@@ -130,6 +130,21 @@ export function meusIngressos() {
   return pedir<IngressoComEvento[]>("/api/me/tickets");
 }
 
+export interface ResultadoCheckin {
+  mensagem: string;
+  codigo: string;
+  checkedIn: boolean;
+  checkedInAt: string | null;
+}
+
+// Check-in de um ingresso pelo código, na gestão do evento (exige sessão de dono).
+export function fazerCheckin(eventoId: string, codigo: string) {
+  return pedir<ResultadoCheckin>(`/api/organizer/events/${eventoId}/checkin`, {
+    method: "POST",
+    body: JSON.stringify({ codigo }),
+  });
+}
+
 export function registrar(dados: { name: string; email: string; password: string }) {
   return pedir<{ user: Usuario }>("/api/auth/register", {
     method: "POST",
