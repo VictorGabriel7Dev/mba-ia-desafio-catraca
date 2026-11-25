@@ -8,7 +8,7 @@
 // seguida ja reflete as compras que commitaram antes. Sem a trava, duas compras
 // simultaneas leriam a mesma contagem e ambas inseririam (overselling).
 import type { Event, Ticket } from "@prisma/client";
-import type { ResultadoGateway } from "../domain/ingresso";
+import type { ResultadoGateway, StatusIngresso } from "../domain/ingresso";
 import { prisma } from "../lib/prisma";
 
 export interface DadosCompra {
@@ -87,5 +87,41 @@ export async function listarPorComprador(userId: string): Promise<IngressoComEve
     where: { buyerUserId: userId },
     orderBy: { createdAt: "desc" },
     include: { event: true },
+  });
+}
+
+// Agregados do painel do evento (F5), so leitura. Mantem o Prisma aqui: servicos
+// e rotas nunca contam ou somam direto.
+
+export interface ContagemStatus {
+  status: StatusIngresso;
+  total: number;
+}
+
+// Contagem de ingressos por status, numa unica consulta agregada (groupBy). Os
+// status sem nenhum ingresso simplesmente nao aparecem no resultado.
+export async function contarPorStatus(eventId: string): Promise<ContagemStatus[]> {
+  const grupos = await prisma.ticket.groupBy({
+    by: ["status"],
+    where: { eventId },
+    _count: true,
+  });
+  return grupos.map((grupo) => ({ status: grupo.status, total: grupo._count }));
+}
+
+// Receita realizada: soma de pricePaidCents dos ingressos confirmados. Usa o
+// preco pago (snapshot, R03) de cada ingresso, nunca o priceCents atual do evento.
+export async function somarReceitaConfirmados(eventId: string): Promise<number> {
+  const resultado = await prisma.ticket.aggregate({
+    where: { eventId, status: "confirmed" },
+    _sum: { pricePaidCents: true },
+  });
+  return resultado._sum.pricePaidCents ?? 0;
+}
+
+// Check-ins realizados: ingressos confirmados que ja entraram (checkedIn = true).
+export async function contarCheckins(eventId: string): Promise<number> {
+  return prisma.ticket.count({
+    where: { eventId, status: "confirmed", checkedIn: true },
   });
 }
