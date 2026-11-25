@@ -19,7 +19,7 @@ fi
 POSTGRES_USER="${POSTGRES_USER:-catraca}"
 POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-catraca}"
 DB_HOST_PORT="${DB_HOST_PORT:-5432}"
-DB_TESTE="catraca_test"
+DB_TESTE="${DB_TESTE:-catraca_test}"
 URL_TESTE="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${DB_HOST_PORT}/${DB_TESTE}?schema=public"
 
 echo "[gates] garantindo o Postgres no ar..."
