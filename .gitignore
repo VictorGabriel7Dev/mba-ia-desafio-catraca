@@ -2,3 +2,6 @@ node_modules/
 .env
 _DESENVOLVIMENTO.md
 dist/
+coverage/
+*.log
+.DS_Store
