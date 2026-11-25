@@ -78,6 +78,12 @@ export async function criarCompraAtomica(dados: DadosCompra): Promise<ResultadoR
   });
 }
 
+// Busca um ingresso por id (consulta da API de parceiros, F6). Traz todas as
+// colunas do Ticket, inclusive `checkedIn`. Nulo quando nao existe.
+export async function buscarPorId(id: string): Promise<Ticket | null> {
+  return prisma.ticket.findUnique({ where: { id } });
+}
+
 // "Meus ingressos" do participante: ingressos vinculados a conta dele, com o
 // evento embutido para exibir nome/estado.
 export type IngressoComEvento = Ticket & { event: Event };
