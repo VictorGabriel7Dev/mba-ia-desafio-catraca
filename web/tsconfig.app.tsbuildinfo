@@ -1,1 +1,0 @@
-{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/EventoForm.tsx","./src/lib/api.ts","./src/lib/auth.tsx","./src/lib/formato.ts","./src/pages/EventManagePage.tsx","./src/pages/HomePage.tsx","./src/pages/LoginPage.tsx","./src/pages/OrganizerPage.tsx","./src/pages/RegisterPage.tsx"],"version":"5.9.3"}

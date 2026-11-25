@@ -3,5 +3,6 @@ node_modules/
 _DESENVOLVIMENTO.md
 dist/
 coverage/
+*.tsbuildinfo
 *.log
 .DS_Store
