@@ -1,0 +1,106 @@
+// Esquema canônico da Catraca (ver docs/specs/_CONVENCOES.md).
+// O esquema completo entra já na F1; as features seguintes só adicionam comportamento.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  participant
+  organizer
+}
+
+enum EventStatus {
+  draft
+  published
+  cancelled
+}
+
+enum TicketStatus {
+  pending
+  confirmed
+  declined
+  cancelled
+  refunded
+}
+
+enum PaymentOutcome {
+  approved
+  declined
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+
+  // Eventos operados por este usuário quando é organizador.
+  events  Event[]
+  // Ingressos comprados por este usuário quando é participante.
+  tickets Ticket[]
+}
+
+model PartnerKey {
+  id     String  @id @default(cuid())
+  key    String  @unique
+  name   String
+  active Boolean @default(true)
+}
+
+model Event {
+  id          String      @id @default(cuid())
+  organizerId String
+  organizer   User        @relation(fields: [organizerId], references: [id])
+  name        String
+  startsAt    DateTime    @db.Timestamptz(6)
+  location    String
+  capacity    Int
+  priceCents  Int
+  status      EventStatus @default(draft)
+  createdAt   DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime    @updatedAt @db.Timestamptz(6)
+
+  tickets Ticket[]
+}
+
+model Ticket {
+  id             String       @id @default(cuid())
+  eventId        String
+  event          Event        @relation(fields: [eventId], references: [id])
+  code           String       @unique
+  buyerEmail     String
+  // Nulo quando a compra vem da API de parceiros (sem conta vinculada).
+  buyerUserId    String?
+  buyer          User?        @relation(fields: [buyerUserId], references: [id])
+  status         TicketStatus @default(pending)
+  // Preço do evento no momento da compra (R03); não muda se o preço do evento mudar.
+  pricePaidCents Int
+  checkedIn      Boolean      @default(false)
+  checkedInAt    DateTime?    @db.Timestamptz(6)
+  createdAt      DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime     @updatedAt @db.Timestamptz(6)
+
+  payment Payment?
+}
+
+model Payment {
+  id          String         @id @default(cuid())
+  ticketId    String         @unique
+  ticket      Ticket         @relation(fields: [ticketId], references: [id])
+  // Apenas os quatro últimos dígitos; nunca o número completo do cartão.
+  cardLast4   String
+  // Decidido na criação pela regra do final do cartão.
+  outcome     PaymentOutcome
+  // Criação mais o atraso sorteado na faixa do cartão.
+  resolveAt   DateTime       @db.Timestamptz(6)
+  // Nulo até o worker resolver o pagamento.
+  processedAt DateTime?      @db.Timestamptz(6)
+}
