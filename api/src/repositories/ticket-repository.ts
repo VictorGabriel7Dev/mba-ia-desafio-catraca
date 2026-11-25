@@ -89,3 +89,24 @@ export async function listarPorComprador(userId: string): Promise<IngressoComEve
     include: { event: true },
   });
 }
+
+// Check-in (F4): busca o ingresso pelo codigo NO ESCOPO do evento. Fora do escopo
+// (codigo de outro evento) nao casa, entao o check-in trata como invalido (R10).
+export async function buscarPorCodigoNoEvento(
+  eventId: string,
+  codigo: string,
+): Promise<Ticket | null> {
+  return prisma.ticket.findFirst({ where: { eventId, code: codigo } });
+}
+
+// Marca o check-in de forma CONDICIONAL: so efetiva se o ingresso ainda nao
+// estava usado (`checkedIn = false`). Retorna true quando marcou agora e false
+// quando ja estava marcado (corrida de duplo check-in). Espelha a transicao
+// condicional do gateway: a condicao mora no WHERE, nao numa leitura previa.
+export async function marcarCheckinSeNaoUsado(ticketId: string, agora: Date): Promise<boolean> {
+  const resultado = await prisma.ticket.updateMany({
+    where: { id: ticketId, checkedIn: false },
+    data: { checkedIn: true, checkedInAt: agora },
+  });
+  return resultado.count === 1;
+}
