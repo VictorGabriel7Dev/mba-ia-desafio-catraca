@@ -5,7 +5,7 @@
 import { env } from "./config/env";
 import { processarPagamentosVencidos } from "./services/payment-worker";
 
-const INTERVALO_MS = 2000;
+const INTERVALO_MS = 1000;
 
 function iniciar(): void {
   console.log(`Worker da Catraca iniciado (ambiente ${env.NODE_ENV}).`);

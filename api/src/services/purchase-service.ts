@@ -4,6 +4,7 @@
 // o Payment quando o resolveAt vencer. Codigos de erro em docs/specs/_CONVENCOES.md.
 import type { Ticket } from "@prisma/client";
 import { cartaoTem16Digitos, decidirPagamento, ultimos4 } from "../domain/gateway-sim";
+import { emailValido } from "../domain/usuario";
 import {
   gerarCodigoIngresso,
   rotuloStatusIngresso,
@@ -65,7 +66,13 @@ export async function comprar(entrada: EntradaCompra, agora: Date = new Date()):
   const { eventId, buyerEmail, cardNumber } = entrada;
   const buyerUserId = entrada.buyerUserId ?? null;
 
-  // Cartao fora de 16 digitos: rejeita ANTES de criar o ingresso.
+  // Corpo invalido rejeita ANTES de criar o ingresso (R brief: e-mail mal formado
+  // ou cartao sem 16 digitos -> 422 invalid_request). O caminho da vitrine ja
+  // passa um e-mail valido (o do participante logado); a checagem protege a API
+  // de parceiros, que recebe o e-mail do corpo.
+  if (!emailValido(buyerEmail)) {
+    throw new ErroAplicacao("invalid_request", 422, "E-mail do comprador invalido.");
+  }
   if (!cartaoTem16Digitos(cardNumber)) {
     throw new ErroAplicacao("invalid_request", 422, "Cartao deve ter 16 digitos.");
   }

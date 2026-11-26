@@ -143,6 +143,16 @@ describe("C-F6-02 POST /purchases: 202 no caminho feliz e a ordem dos erros", ()
     expect(resp.body.error).toBe("invalid_request");
   });
 
+  it("e-mail mal formado vence o evento inexistente: 422 invalid_request", async () => {
+    await criarChaveParceiro(CHAVE);
+    const resp = await request(app)
+      .post(`/api/partner/events/evento-que-nao-existe/purchases`)
+      .set("X-Api-Key", CHAVE)
+      .send({ buyerEmail: "sem-arroba", cardNumber: CARTAO_APROVADO_RAPIDO });
+    expect(resp.status).toBe(422);
+    expect(resp.body.error).toBe("invalid_request");
+  });
+
   it("evento rascunho com corpo valido: 404 event_not_available", async () => {
     await criarChaveParceiro(CHAVE);
     const rascunho = await criarEventoRascunho();

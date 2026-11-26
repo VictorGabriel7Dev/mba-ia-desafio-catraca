@@ -47,7 +47,7 @@ O `outcome` e o `resolveAt` são calculados na criação da compra e gravados no
 
 ## Códigos de erro e respostas
 
-- **API de parceiros** (corpo de erro sempre `{"error": "<codigo>"}`): `401 unauthorized` (sem `X-Api-Key` ou inválida), `422 invalid_request` (corpo inválido, inclusive cartão fora de 16 dígitos), `404 event_not_available` (evento inexistente, rascunho ou cancelado), `409 sold_out` (sem vaga), `404 ticket_not_found` (ingresso inexistente). Ordem de verificação na compra: 401 -> 422 -> 404 -> 409.
+- **API de parceiros** (corpo de erro sempre `{"error": "<codigo>"}`): `401 unauthorized` (sem `X-Api-Key` ou inválida), `422 invalid_request` (corpo inválido: campo faltando, e-mail mal formado ou cartão fora de 16 dígitos), `404 event_not_available` (evento inexistente, rascunho ou cancelado), `409 sold_out` (sem vaga), `404 ticket_not_found` (ingresso inexistente). Ordem de verificação na compra: 401 -> 422 -> 404 -> 409.
 - **Vitrine/organizador** (front + rotas internas): sem vaga mostra "Ingressos esgotados"; o organizador só opera os próprios eventos (acesso negado nos de outro, inclusive por URL direta); visitante e participante não acessam a área de organizador.
 - **Mensagens de check-in (R10)**, na ordem, a primeira verdadeira vence: "Ingresso inválido para este evento" (código inexistente ou de outro evento); "Evento cancelado"; "Ingresso não confirmado"; "Ingresso já utilizado"; "Entrada liberada".
 
