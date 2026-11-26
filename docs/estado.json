@@ -1,0 +1,43 @@
+{
+  "projeto": "Catraca",
+  "commit": "0575bba",
+  "atualizadoEm": "2026-11-25",
+  "features": {
+    "F1": {
+      "nome": "Contas e sessão",
+      "status": "aprovada",
+      "spec": "docs/specs/F1-contas-e-sessao.md",
+      "relatorio": "docs/avaliacoes/F1-2026-11-25.md"
+    },
+    "F2": {
+      "nome": "Eventos (ciclo de vida)",
+      "status": "aprovada",
+      "spec": "docs/specs/F2-eventos.md",
+      "relatorio": "docs/avaliacoes/F2-2026-11-25.md"
+    },
+    "F3": {
+      "nome": "Compra, vagas e pagamento",
+      "status": "aprovada",
+      "spec": "docs/specs/F3-compra-vagas-pagamento.md",
+      "relatorio": "docs/avaliacoes/F3-2026-11-25.md"
+    },
+    "F4": {
+      "nome": "Check-in",
+      "status": "aprovada",
+      "spec": "docs/specs/F4-check-in.md",
+      "relatorio": "docs/avaliacoes/F4-2026-11-25.md"
+    },
+    "F5": {
+      "nome": "Painel do evento",
+      "status": "aprovada",
+      "spec": "docs/specs/F5-painel.md",
+      "relatorio": "docs/avaliacoes/F5-2026-11-25.md"
+    },
+    "F6": {
+      "nome": "API de parceiros",
+      "status": "aprovada",
+      "spec": "docs/specs/F6-api-parceiros.md",
+      "relatorio": "docs/avaliacoes/F6-2026-11-25.md"
+    }
+  }
+}
