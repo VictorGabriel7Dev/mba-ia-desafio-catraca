@@ -5,7 +5,7 @@ Venda de ingressos para eventos pequenos. Monorepo Node/TS + Express + Prisma/Po
 ## Comandos (um sobe, um derruba, um valida)
 - `bash scripts/up.sh` - sobe tudo do zero (build, banco, migrações, seed idempotente) e imprime os endereços e contas.
 - `bash scripts/down.sh` - derruba mantendo os dados; `bash scripts/down.sh --tudo` apaga o volume.
-- `bash scripts/gates.sh` - roda todos os gates (api: lint, typecheck, test; web: lint, typecheck, build). Sai != 0 se algum falhar; na main com F1 pronto passa 100%.
+- `bash scripts/gates.sh` - roda todos os gates (api: lint, typecheck, test; web: lint, typecheck, build). Sai != 0 se algum falhar; na main passa 100%.
 
 ## Endereços
 - API http://localhost:4000 (saude em `/health`) - Web http://localhost:5173 - Postgres localhost:5432.
@@ -34,4 +34,4 @@ JWT em cookie httpOnly `catraca_session`. Para clientes não-browser (curl, test
 - `docs/specs/` - specs/contratos (contrato, não editar). `docs/PRD.md` - visão. `docs/avaliacoes/` - relatórios. `docs/estado.json` - estado por feature.
 
 ## Estado atual
-F1 (contas e sessão) implementada e testada. Schema Prisma completo (User, PartnerKey, Event, Ticket, Payment) já entra na F1; F2 a F6 só adicionam comportamento. Worker é no-op até a F3.
+Produto completo: as seis features (F1 contas, F2 eventos, F3 compra/vagas/pagamento, F4 check-in, F5 painel, F6 API de parceiros) implementadas, integradas na main e aprovadas na avaliação independente (ver `docs/estado.json`). O schema Prisma completo (User, PartnerKey, Event, Ticket, Payment) já entra na F1; as features seguintes só adicionam comportamento. O worker processa os pagamentos do gateway simulado (F3).
