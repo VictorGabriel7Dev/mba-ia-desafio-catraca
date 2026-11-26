@@ -14,6 +14,7 @@ import {
   precoValido,
   type StatusEvento,
 } from "../domain/evento";
+import { vagasDisponiveis } from "../domain/ingresso";
 import { ErroAplicacao } from "../lib/errors";
 import * as eventos from "../repositories/event-repository";
 import { cancelarEventoComIngressos } from "./cancel-tickets";
@@ -169,6 +170,36 @@ export async function obterPublicado(eventId: string): Promise<EventoPublico> {
     throw new ErroAplicacao("event_not_available", 404, "Evento indisponivel.");
   }
   return paraPublico(evento);
+}
+
+// Item da listagem da API de parceiros (F6): so os campos do contrato, com
+// `availableSeats` = vagas disponiveis (R05).
+export interface EventoParceiro {
+  id: string;
+  name: string;
+  startsAt: string;
+  priceCents: number;
+  availableSeats: number;
+}
+
+// Listagem da API de parceiros: so eventos publicados e nao cancelados (R02),
+// cada um com as vagas disponiveis no momento. Reusa a mesma porta da vitrine
+// (listarPublicados) e a contagem de ocupadas (R05).
+export async function listarParaParceiros(): Promise<EventoParceiro[]> {
+  const lista = await eventos.listarPublicados();
+  const itens: EventoParceiro[] = [];
+  for (const evento of lista) {
+    const ocupadas = await eventos.contarOcupadas(evento.id);
+    itens.push({
+      id: evento.id,
+      name: evento.name,
+      startsAt: evento.startsAt.toISOString(),
+      priceCents: evento.priceCents,
+      // listarPublicados nunca traz cancelado, entao o flag de cancelado e falso.
+      availableSeats: vagasDisponiveis(evento.capacity, ocupadas, false),
+    });
+  }
+  return itens;
 }
 
 export async function listarDoOrganizador(organizerId: string): Promise<EventoPublico[]> {
