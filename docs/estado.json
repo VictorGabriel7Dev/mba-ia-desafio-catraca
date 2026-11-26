@@ -1,6 +1,6 @@
 {
   "projeto": "Catraca",
-  "commit": "0575bba",
+  "commit": "aa27311",
   "atualizadoEm": "2026-11-25",
   "features": {
     "F1": {
@@ -37,7 +37,11 @@
       "nome": "API de parceiros",
       "status": "aprovada",
       "spec": "docs/specs/F6-api-parceiros.md",
-      "relatorio": "docs/avaliacoes/F6-2026-11-25.md"
+      "relatorio": "docs/avaliacoes/F6-2026-11-25-v2.md",
+      "relatorios": [
+        "docs/avaliacoes/F6-2026-11-25.md",
+        "docs/avaliacoes/F6-2026-11-25-v2.md"
+      ]
     }
   }
 }
