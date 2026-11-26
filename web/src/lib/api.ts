@@ -71,6 +71,20 @@ export function obterEventoGestao(id: string) {
   return pedir<Evento>(`/api/organizer/events/${id}`);
 }
 
+// Painel do evento (F5): os seis números da página de gestão.
+export interface PainelEvento {
+  confirmados: number;
+  pendentes: number;
+  checkins: number;
+  vagasDisponiveis: number;
+  receitaCents: number;
+  estornados: number;
+}
+
+export function obterPainelEvento(id: string) {
+  return pedir<PainelEvento>(`/api/organizer/events/${id}/painel`);
+}
+
 export function criarEvento(dados: DadosEvento) {
   return pedir<Evento>("/api/organizer/events", {
     method: "POST",

@@ -7,10 +7,12 @@ import {
   cancelarEvento,
   editarEvento,
   obterEventoGestao,
+  obterPainelEvento,
   publicarEvento,
   ErroApi,
   type DadosEvento,
   type Evento,
+  type PainelEvento,
 } from "../lib/api";
 import { formatarData, formatarPreco, isoParaLocal } from "../lib/formato";
 import { EventoForm } from "../components/EventoForm";
@@ -18,6 +20,7 @@ import { EventoForm } from "../components/EventoForm";
 export function EventManagePage(): ReactElement {
   const { id } = useParams<{ id: string }>();
   const [evento, setEvento] = useState<Evento | null>(null);
+  const [painel, setPainel] = useState<PainelEvento | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
@@ -31,6 +34,11 @@ export function EventManagePage(): ReactElement {
       .then((e) => {
         setEvento(e);
         setErro(null);
+        // Painel do evento (F5): numeros carregados em paralelo; uma falha aqui
+        // nao derruba a pagina de gestao, so esconde o bloco.
+        obterPainelEvento(e.id)
+          .then(setPainel)
+          .catch(() => setPainel(null));
       })
       .catch((e: unknown) => {
         if (e instanceof ErroApi && e.codigo === "forbidden") {
@@ -122,6 +130,20 @@ export function EventManagePage(): ReactElement {
         lotação {evento.capacity}
       </p>
 
+      {painel && (
+        <div style={{ margin: "1rem 0" }}>
+          <h3>Painel</h3>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+            <Numero rotulo="Confirmados" valor={String(painel.confirmados)} />
+            <Numero rotulo="Pendentes" valor={String(painel.pendentes)} />
+            <Numero rotulo="Check-ins" valor={String(painel.checkins)} />
+            <Numero rotulo="Vagas disponíveis" valor={String(painel.vagasDisponiveis)} />
+            <Numero rotulo="Receita" valor={formatarPreco(painel.receitaCents)} />
+            <Numero rotulo="Estornados" valor={String(painel.estornados)} />
+          </div>
+        </div>
+      )}
+
       <div style={{ display: "flex", gap: "0.5rem", margin: "0.5rem 0" }}>
         {evento.status === "draft" && <button onClick={() => void publicar()}>Publicar</button>}
         {editavel && <button onClick={() => void cancelar()}>Cancelar evento</button>}
@@ -148,5 +170,22 @@ export function EventManagePage(): ReactElement {
 
       {aviso && <p>{aviso}</p>}
     </section>
+  );
+}
+
+// Cartao simples de um numero do painel (rotulo + valor).
+function Numero({ rotulo, valor }: { rotulo: string; valor: string }): ReactElement {
+  return (
+    <div
+      style={{
+        border: "1px solid #ddd",
+        borderRadius: "0.5rem",
+        padding: "0.5rem 0.75rem",
+        minWidth: "7rem",
+      }}
+    >
+      <div style={{ fontSize: "0.8rem", color: "#666" }}>{rotulo}</div>
+      <strong style={{ fontSize: "1.25rem" }}>{valor}</strong>
+    </div>
   );
 }
