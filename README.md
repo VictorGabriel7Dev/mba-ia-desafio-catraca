@@ -44,7 +44,11 @@ Participantes também podem criar a própria conta pela interface; organizadores
 - `docs/FLUXO-DO-AVALIADOR.md` - como subir, rodar os gates e conferir o produto do zero.
 - `AGENTS.md` - porta de entrada dos agentes: comandos, contas, regras de camada e mapa.
 
-PRs da wave paralela (F4, F5 e F6, integradas por PR): `feature/f4-check-in`, `feature/f5-painel`, `feature/f6-api-parceiros`. Os links dos PRs no GitHub entram aqui na publicação do repositório; os commits de cada PR se entrelaçam no tempo (o primeiro de cada um antecede o último dos outros).
+PRs da wave paralela, integrados por PR (os commits de cada um se entrelaçam no tempo: o primeiro commit de cada PR antecede o último dos outros):
+
+- F6 (API de parceiros): https://github.com/VictorGabriel7Dev/mba-ia-desafio-catraca/pull/1
+- F5 (painel do evento): https://github.com/VictorGabriel7Dev/mba-ia-desafio-catraca/pull/2
+- F4 (check-in): https://github.com/VictorGabriel7Dev/mba-ia-desafio-catraca/pull/3
 
 ## Decisões
 
