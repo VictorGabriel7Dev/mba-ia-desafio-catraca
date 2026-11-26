@@ -124,6 +124,30 @@ export async function listarIngressosDoParticipante(userId: string): Promise<Ing
   }));
 }
 
+// Consulta de ingresso pela API de parceiros (F6): status e check-in. Ingresso
+// inexistente => 404 ticket_not_found (ordem de erros em _CONVENCOES.md).
+export interface IngressoParceiro {
+  ticketId: string;
+  code: string;
+  eventId: string;
+  status: StatusIngresso;
+  checkedIn: boolean;
+}
+
+export async function obterIngressoParaParceiro(ticketId: string): Promise<IngressoParceiro> {
+  const ticket = await ingressos.buscarPorId(ticketId);
+  if (!ticket) {
+    throw new ErroAplicacao("ticket_not_found", 404, "Ingresso nao encontrado.");
+  }
+  return {
+    ticketId: ticket.id,
+    code: ticket.code,
+    eventId: ticket.eventId,
+    status: ticket.status,
+    checkedIn: ticket.checkedIn,
+  };
+}
+
 export interface Disponibilidade {
   capacity: number;
   ocupadas: number;

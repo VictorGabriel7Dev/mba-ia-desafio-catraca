@@ -3,6 +3,7 @@
 // eventos (R13). A pagina de gestao responde por URL propria /events/:id (R04).
 import { Router } from "express";
 import * as eventos from "../services/event-service";
+import * as stats from "../services/stats-service";
 import * as checkin from "../services/checkin-service";
 import { exigirSessao } from "./middlewares/exigir-sessao";
 import { exigirPapel } from "./middlewares/exigir-papel";
@@ -36,6 +37,15 @@ organizerRoutes.get(
   envolver(async (req, res) => {
     const evento = await eventos.obterParaGestao(req.params.id, req.sessao!.sub);
     res.status(200).json(evento);
+  }),
+);
+
+// Painel do evento (F5, R12): os seis numeros, restrito ao dono (R13).
+organizerRoutes.get(
+  "/events/:id/painel",
+  envolver(async (req, res) => {
+    const painel = await stats.painelDoEvento(req.params.id, req.sessao!.sub);
+    res.status(200).json(painel);
   }),
 );
 
