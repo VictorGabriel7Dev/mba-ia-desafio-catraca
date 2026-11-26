@@ -1,11 +1,12 @@
 // Pagina de gestao de um evento por URL propria (F2, R04): /organizador/eventos/:id.
 // Mostra o evento, permite editar e as acoes publicar/cancelar. O acesso a um
 // evento de outro organizador e negado pela API (R13) e tratado aqui.
-import { useCallback, useEffect, useState, type ReactElement } from "react";
+import { useCallback, useEffect, useState, type FormEvent, type ReactElement } from "react";
 import { useParams } from "react-router-dom";
 import {
   cancelarEvento,
   editarEvento,
+  fazerCheckin,
   obterEventoGestao,
   obterPainelEvento,
   publicarEvento,
@@ -24,6 +25,8 @@ export function EventManagePage(): ReactElement {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [codigoCheckin, setCodigoCheckin] = useState("");
+  const [mensagemCheckin, setMensagemCheckin] = useState<string | null>(null);
 
   const carregar = useCallback(() => {
     if (!id) {
@@ -110,6 +113,19 @@ export function EventManagePage(): ReactElement {
     }
   }
 
+  async function checar(ev: FormEvent): Promise<void> {
+    ev.preventDefault();
+    if (!id) {
+      return;
+    }
+    try {
+      const resultado = await fazerCheckin(id, codigoCheckin);
+      setMensagemCheckin(resultado.mensagem);
+    } catch {
+      setMensagemCheckin("Não foi possível fazer o check-in.");
+    }
+  }
+
   if (carregando) {
     return <p>Carregando...</p>;
   }
@@ -169,6 +185,19 @@ export function EventManagePage(): ReactElement {
       )}
 
       {aviso && <p>{aviso}</p>}
+
+      <h3>Check-in</h3>
+      <form onSubmit={(ev) => void checar(ev)} style={{ display: "flex", gap: "0.5rem" }}>
+        <input
+          type="text"
+          value={codigoCheckin}
+          onChange={(ev) => setCodigoCheckin(ev.target.value)}
+          placeholder="Código do ingresso"
+          aria-label="Código do ingresso"
+        />
+        <button type="submit">Validar entrada</button>
+      </form>
+      {mensagemCheckin && <p>{mensagemCheckin}</p>}
     </section>
   );
 }
